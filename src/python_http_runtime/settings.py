@@ -103,7 +103,10 @@ def _normalize_timeout_seconds(timeout_seconds: float | None) -> float | None:
     if timeout_seconds is None:
         return None
 
-    if isinstance(timeout_seconds, bool) or not isinstance(timeout_seconds, (int, float)):
+    if isinstance(timeout_seconds, bool) or not isinstance(
+        timeout_seconds,
+        (int, float),
+    ):
         raise HttpConfigurationError(
             "Runtime default timeout must be an int, float, or None."
         )

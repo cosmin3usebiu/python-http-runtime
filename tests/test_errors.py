@@ -6,11 +6,12 @@ from dataclasses import dataclass
 
 import pytest
 
-from python_http_runtime.errors import HttpMiddlewareError
-from python_http_runtime.errors import HttpTransportError
-from python_http_runtime.middleware import ExecutionContext
-from python_http_runtime.middleware import ExecutionHandler
-from python_http_runtime.middleware import ExecutionMiddleware
+from python_http_runtime.errors import HttpMiddlewareError, HttpTransportError
+from python_http_runtime.middleware import (
+    ExecutionContext,
+    ExecutionHandler,
+    ExecutionMiddleware,
+)
 from python_http_runtime.request import HttpRequest
 from python_http_runtime.response import HttpResponse
 from python_http_runtime.runtime import HttpRuntime

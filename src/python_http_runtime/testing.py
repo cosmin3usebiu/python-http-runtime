@@ -9,8 +9,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Sequence, TypeAlias
 
-from python_http_runtime.errors import HttpConfigurationError
-from python_http_runtime.errors import HttpTransportError
+from python_http_runtime.errors import HttpConfigurationError, HttpTransportError
 from python_http_runtime.request import HttpRequest
 from python_http_runtime.response import HttpResponse
 from python_http_runtime.transport import Transport
@@ -45,7 +44,11 @@ class MockTransport(Transport):
     """
 
     outcomes: Sequence[MockTransportOutcome] = field(default_factory=tuple)
-    _executed_requests: list[HttpRequest] = field(default_factory=list, init=False, repr=False)
+    _executed_requests: list[HttpRequest] = field(
+        default_factory=list,
+        init=False,
+        repr=False,
+    )
     _next_outcome_index: int = field(default=0, init=False, repr=False)
 
     def __post_init__(self) -> None:
@@ -54,7 +57,8 @@ class MockTransport(Transport):
         for outcome in normalized_outcomes:
             if not isinstance(outcome, (HttpResponse, Exception)):
                 raise HttpConfigurationError(
-                    "Mock transport outcomes must be HttpResponse or Exception instances."
+                    "Mock transport outcomes must be HttpResponse or "
+                    "Exception instances."
                 )
 
         self.outcomes = normalized_outcomes

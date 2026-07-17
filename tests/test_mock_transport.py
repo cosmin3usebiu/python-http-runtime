@@ -4,9 +4,11 @@ from __future__ import annotations
 
 import pytest
 
-from python_http_runtime.errors import HttpConfigurationError
-from python_http_runtime.errors import HttpTimeoutError
-from python_http_runtime.errors import HttpTransportError
+from python_http_runtime.errors import (
+    HttpConfigurationError,
+    HttpTimeoutError,
+    HttpTransportError,
+)
 from python_http_runtime.request import HttpRequest
 from python_http_runtime.response import HttpResponse
 from python_http_runtime.testing import MockTransport

@@ -4,11 +4,11 @@ from __future__ import annotations
 
 import pytest
 
-from python_http_runtime.errors import HttpConfigurationError
-from python_http_runtime.errors import HttpTimeoutError
-from python_http_runtime.errors import HttpTransportError
-from python_http_runtime.policies import RateLimitMiddleware
-from python_http_runtime.policies import RetryMiddleware
+from python_http_runtime.errors import (
+    HttpConfigurationError,
+    HttpTimeoutError,
+)
+from python_http_runtime.policies import RateLimitMiddleware, RetryMiddleware
 from python_http_runtime.request import HttpRequest
 from python_http_runtime.response import HttpResponse
 from python_http_runtime.runtime import HttpRuntime
@@ -145,7 +145,8 @@ def test_rate_limit_middleware_rejects_invalid_configuration() -> None:
     with pytest.raises(
         HttpConfigurationError,
         match=(
-            "Rate-limit middleware minimum_interval_seconds must be greater than or equal to zero."
+            "Rate-limit middleware minimum_interval_seconds must be "
+            "greater than or equal to zero."
         ),
     ):
         RateLimitMiddleware(minimum_interval_seconds=-1.0)

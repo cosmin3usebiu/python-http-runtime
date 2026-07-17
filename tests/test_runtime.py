@@ -4,13 +4,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from python_http_runtime.auth import ApiKeyHeaderMiddleware
-from python_http_runtime.auth import BearerTokenMiddleware
-from python_http_runtime.middleware import ExecutionContext
-from python_http_runtime.middleware import ExecutionHandler
-from python_http_runtime.middleware import ExecutionMiddleware
-from python_http_runtime.policies import RateLimitMiddleware
-from python_http_runtime.policies import RetryMiddleware
+from python_http_runtime.auth import ApiKeyHeaderMiddleware, BearerTokenMiddleware
+from python_http_runtime.middleware import (
+    ExecutionContext,
+    ExecutionHandler,
+    ExecutionMiddleware,
+)
+from python_http_runtime.policies import RateLimitMiddleware, RetryMiddleware
 from python_http_runtime.request import HttpRequest
 from python_http_runtime.response import HttpResponse
 from python_http_runtime.runtime import HttpRuntime

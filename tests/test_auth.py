@@ -6,10 +6,12 @@ import base64
 
 import pytest
 
-from python_http_runtime.auth import ApiKeyHeaderMiddleware
-from python_http_runtime.auth import BasicAuthMiddleware
-from python_http_runtime.auth import BearerTokenMiddleware
-from python_http_runtime.auth import CustomHeaderInjectionMiddleware
+from python_http_runtime.auth import (
+    ApiKeyHeaderMiddleware,
+    BasicAuthMiddleware,
+    BearerTokenMiddleware,
+    CustomHeaderInjectionMiddleware,
+)
 from python_http_runtime.errors import HttpConfigurationError
 from python_http_runtime.request import HttpRequest
 from python_http_runtime.response import HttpResponse

@@ -66,7 +66,11 @@ def test_request_freezes_header_and_query_mappings() -> None:
         ("method", "   ", "HTTP request method must be non-empty."),
         ("method", "GET POST", "HTTP request method must not contain whitespace."),
         ("target", "   ", "HTTP request target must be non-empty."),
-        ("target", "/path with spaces", "HTTP request target must not contain whitespace."),
+        (
+            "target",
+            "/path with spaces",
+            "HTTP request target must not contain whitespace.",
+        ),
     ],
 )
 def test_request_rejects_invalid_method_and_target(

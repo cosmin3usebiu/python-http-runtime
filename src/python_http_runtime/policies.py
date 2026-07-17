@@ -8,14 +8,14 @@ from __future__ import annotations
 
 import time
 from collections.abc import Callable
-from dataclasses import dataclass
-from dataclasses import field
+from dataclasses import dataclass, field
 
-from python_http_runtime.errors import HttpConfigurationError
-from python_http_runtime.errors import HttpTransportError
-from python_http_runtime.middleware import ExecutionContext
-from python_http_runtime.middleware import ExecutionHandler
-from python_http_runtime.middleware import ExecutionMiddleware
+from python_http_runtime.errors import HttpConfigurationError, HttpTransportError
+from python_http_runtime.middleware import (
+    ExecutionContext,
+    ExecutionHandler,
+    ExecutionMiddleware,
+)
 from python_http_runtime.response import HttpResponse
 
 
@@ -47,7 +47,10 @@ class RetryMiddleware(ExecutionMiddleware):
 
     def __post_init__(self) -> None:
         """Validate retry middleware configuration."""
-        if isinstance(self.max_attempts, bool) or not isinstance(self.max_attempts, int):
+        if isinstance(self.max_attempts, bool) or not isinstance(
+            self.max_attempts,
+            int,
+        ):
             raise HttpConfigurationError(
                 "Retry middleware max_attempts must be an integer."
             )
@@ -110,7 +113,11 @@ class RateLimitMiddleware(ExecutionMiddleware):
     minimum_interval_seconds: float = 0.0
     _time_provider: Callable[[], float] = field(default=time.monotonic, repr=False)
     _sleep: Callable[[float], None] = field(default=time.sleep, repr=False)
-    _last_execution_started_at: float | None = field(default=None, init=False, repr=False)
+    _last_execution_started_at: float | None = field(
+        default=None,
+        init=False,
+        repr=False,
+    )
 
     def __post_init__(self) -> None:
         """Validate rate-limit middleware configuration."""
@@ -124,12 +131,14 @@ class RateLimitMiddleware(ExecutionMiddleware):
             or not isinstance(self.minimum_interval_seconds, (int, float))
         ):
             raise HttpConfigurationError(
-                "Rate-limit middleware minimum_interval_seconds must be an int or float."
+                "Rate-limit middleware minimum_interval_seconds must be an "
+                "int or float."
             )
 
         if self.minimum_interval_seconds < 0:
             raise HttpConfigurationError(
-                "Rate-limit middleware minimum_interval_seconds must be greater than or equal to zero."
+                "Rate-limit middleware minimum_interval_seconds must be "
+                "greater than or equal to zero."
             )
 
     def handle(

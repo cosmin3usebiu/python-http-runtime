@@ -12,9 +12,11 @@ from dataclasses import dataclass, field
 from typing import Mapping
 
 from python_http_runtime.errors import HttpConfigurationError
-from python_http_runtime.middleware import ExecutionContext
-from python_http_runtime.middleware import ExecutionHandler
-from python_http_runtime.middleware import ExecutionMiddleware
+from python_http_runtime.middleware import (
+    ExecutionContext,
+    ExecutionHandler,
+    ExecutionMiddleware,
+)
 from python_http_runtime.request import HttpRequest
 from python_http_runtime.response import HttpResponse
 

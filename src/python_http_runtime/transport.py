@@ -8,7 +8,6 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from python_http_runtime.errors import HttpTransportError
 from python_http_runtime.request import HttpRequest
 from python_http_runtime.response import HttpResponse
 

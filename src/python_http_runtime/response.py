@@ -59,7 +59,9 @@ class HttpResponse:
         from python_http_runtime.request import HttpRequest
 
         if isinstance(self.status_code, bool) or not isinstance(self.status_code, int):
-            raise HttpConfigurationError("HTTP response status code must be an integer.")
+            raise HttpConfigurationError(
+                "HTTP response status code must be an integer."
+            )
 
         if self.status_code < 100 or self.status_code > 599:
             raise HttpConfigurationError(
@@ -123,7 +125,10 @@ def _normalize_elapsed_seconds(elapsed_seconds: float | None) -> float | None:
     if elapsed_seconds is None:
         return None
 
-    if isinstance(elapsed_seconds, bool) or not isinstance(elapsed_seconds, (int, float)):
+    if isinstance(elapsed_seconds, bool) or not isinstance(
+        elapsed_seconds,
+        (int, float),
+    ):
         raise HttpConfigurationError(
             "HTTP response elapsed time must be an int, float, or None."
         )
