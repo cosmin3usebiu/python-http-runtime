@@ -2,123 +2,99 @@
 
 ## Status
 
-This is a recovered draft proposal based on observed implementation evidence.
-It does not approve or freeze R002.
+This document records documentation-level decisions derived from the current
+API boundary disposition.
 
-R002 approval/freeze state remains unverified. The API is not frozen. Release Phase is not assigned.
+It does not approve R002, freeze the architecture, freeze the API, assign
+Release Phase, validate builds, validate publication readiness, or validate live
+HTTP behavior.
 
-All decisions in this file are proposed and unapproved unless explicitly stated
-otherwise.
+R002 remains unapproved, unfrozen, API not frozen, and not in Release Phase.
 
-## Decisions To Ratify
+## Documented Decisions
 
 ### DEC-R002-001: R002 Owns HTTP Runtime Orchestration
 
-Decision to ratify:
+R002 owns generic HTTP request execution orchestration through
+`HttpRuntime`.
 
-R002 owns generic HTTP request execution orchestration through runtime,
-middleware, and transport contracts.
+The runtime coordinates request execution. It does not own transport
+implementation details, middleware policy behavior, exchange behavior, or
+downstream domain logic.
 
-Evidence:
+### DEC-R002-002: Transport Is The Primary Extension Point
 
-Observed `HttpRuntime`, `ExecutionContext`, middleware composition, and runtime
-tests.
+`Transport` is the public execution extension point.
 
-Status:
+The contract is intentionally small:
 
-Proposed, not approved.
+```text
+execute(HttpRequest) -> HttpResponse
+```
 
-### DEC-R002-002: R002 Has No Runtime Dependencies
+Transport lifecycle hooks and concrete client integrations are not part of the
+current R002 public contract.
 
-Decision to ratify:
+### DEC-R002-003: Package-Root API Remains Minimal
 
-R002 remains dependency-light and has no runtime package dependencies.
+The package-root API remains limited to:
 
-Evidence:
+- `HttpRuntime`
+- `HttpRequest`
+- `HttpResponse`
+- `RuntimeSettings`
+- `Transport`
 
-`pyproject.toml` declares an empty dependency list.
+Submodule-visible objects are documented separately and are not added to the
+package root.
 
-Status:
+### DEC-R002-004: Policy Behavior Belongs In Middleware
 
-Proposed, not approved.
+Authentication, retry, and rate limiting are middleware/policy behavior. They
+are not runtime responsibilities.
 
-### DEC-R002-003: Transport Is The Primary Extension Point
-
-Decision to ratify:
-
-`Transport` is the public extension point for request execution.
-
-Evidence:
-
-Observed public `Transport` export and runtime delegation.
-
-Status:
-
-Proposed, not approved.
-
-### DEC-R002-004: Runtime Orchestrates But Does Not Own Policy Behavior
-
-Decision to ratify:
-
-Retry, rate limiting, and authentication behavior belong to middleware/policy
-components, not the runtime core.
-
-Evidence:
-
-Observed `auth.py`, `policies.py`, and runtime middleware composition.
-
-Status:
-
-Proposed, not approved.
+The runtime executes the middleware pipeline and delegates behavior to the
+middleware objects supplied to it.
 
 ### DEC-R002-005: R002 Does Not Ship A Live HTTP Transport
 
-Decision to ratify:
+R002 defines the runtime and transport contract only.
 
-R002 defines the transport contract and deterministic mock transport behavior
-but does not ship a concrete live network transport.
+It does not ship `requests`, `httpx`, `aiohttp`, or urllib transports. Concrete
+live transports require a separate approved design or work package.
 
-Evidence:
+### DEC-R002-006: Middleware Extension Contracts Are Deferred
 
-Observed `Transport` and `MockTransport`; no requests/httpx/aiohttp transport
-module observed.
+The following objects are public but explicitly non-frozen/deferred:
 
-Status:
+- `ExecutionMiddleware`
+- `ExecutionContext`
+- `ExecutionHandler`
+- `AuthenticationMiddleware`
 
-Proposed, not approved.
+They should be documented as extension/support contracts, not final frozen API.
 
-### DEC-R002-006: Public API Remains Minimal
+### DEC-R002-007: Internal Composition Details Remain Private
 
-Decision to ratify:
+The following objects are internal-only implementation details:
 
-The package-root public API should remain limited to core runtime concepts
-unless an expansion is explicitly approved.
+- `compose_middleware`
+- `MockTransportOutcome`
+- `_bind_request_to_response`
 
-Evidence:
+Users should not depend on these objects as public API.
 
-Observed `__all__` exports exactly five objects and repository tests assert
-minimal public exports.
+## Non-Claims
 
-Status:
+These decisions do not imply:
 
-Proposed, not approved.
-
-## Open Decisions
-
-- Whether `MockTransport` should become public API or remain internal testing
-  support.
-- Whether repository-native HTTP error classes should become public API.
-- Whether auth middleware should remain internal or become public extension API.
-- Whether retry and rate-limit middleware should remain internal or become
-  public extension API.
-- Whether a concrete live transport belongs in R002 or a separate repository.
-- Whether R002 should enter Release Phase after artifact recovery or require
-  code work.
-
-## Evidence Limitations
-
-Source and tests provide implementation evidence. They do not prove prior
-approval, API freeze, milestone approval, or release readiness.
-
-This file does not approve R002, freeze R002, freeze the API, assign Release
-Phase, approve milestones, or declare release readiness.
+- repository approval
+- architecture freeze
+- API freeze
+- Release Phase assignment
+- release readiness
+- build artifact validation
+- package publication readiness
+- production readiness
+- security certification
+- live HTTP transport support

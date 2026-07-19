@@ -2,199 +2,116 @@
 
 ## Status
 
-This is a recovered draft proposal based on observed implementation evidence.
-It does not approve or freeze R002.
+This document records observed implementation state for documentation
+alignment. It does not approve milestones, freeze artifacts, assign Release
+Phase, validate builds, or declare release readiness.
 
-R002 approval/freeze state remains unverified. The API is not frozen. Release Phase is not assigned.
+R002 remains unapproved, unfrozen, API not frozen, and not in Release Phase.
 
-Milestone approval is not granted by this file. Observed code and tests are
-evidence only.
+## Observed Implementation Areas
 
-No milestone is approved or frozen by this file.
+### Repository Structure
 
-## Proposed Milestone 1: Repository Skeleton
+Observed:
 
-Observed evidence:
+- package layout
+- tests
+- docs and examples directories
+- CI workflow
+- packaging metadata
+- `py.typed`
 
-- Packaging metadata.
-- CI workflow.
-- Documentation and example directory structure.
-- Source and test package layout.
-- `py.typed`.
+### Core Object Model
 
-Acceptance criteria:
+Observed:
 
-- Package is importable.
-- Standard repository structure exists.
-- No runtime behavior required.
+- package-root exports limited to five objects
+- request, response, settings, runtime, and transport modules
+- repository-native errors
 
-Status:
+### Request / Response / Settings Models
 
-- Appears implemented based on observed files.
-- Not approved.
+Observed:
 
-## Proposed Milestone 2: Core Package Structure
+- immutable `HttpRequest`
+- immutable `HttpResponse`
+- immutable `RuntimeSettings`
+- structural validation
+- header, body, query parameter, and timeout normalization
 
-Observed evidence:
+### Transport Contract and Mock Transport
 
-- Public package root.
-- Error hierarchy.
-- Transport contract module.
-- Runtime/settings/request/response module boundaries.
-- Tests for repository structure.
+Observed:
 
-Acceptance criteria:
+- one-method `Transport` contract
+- deterministic `MockTransport`
+- request recording
+- response request rebinding
+- transport error normalization
 
-- Minimal package-root exports.
-- Internal modules importable.
-- No broad public API expansion.
+### Runtime Orchestration
 
-Status:
-
-- Appears implemented based on observed source/tests.
-- Not approved.
-
-## Proposed Milestone 3: Request / Response / Settings Models
-
-Observed evidence:
-
-- `HttpRequest`
-- `HttpResponse`
-- `RuntimeSettings`
-- Request/response/settings tests.
-
-Acceptance criteria:
-
-- Immutable boundary objects.
-- Header normalization.
-- Query parameter normalization.
-- Body normalization.
-- Timeout validation.
-- Structural response validation.
-
-Status:
-
-- Appears implemented based on observed source/tests.
-- Not approved.
-
-## Proposed Milestone 4: Transport Contract and Mock Transport
-
-Observed evidence:
-
-- `Transport`
-- `MockTransport`
-- Transport contract tests.
-- Mock transport tests.
-
-Acceptance criteria:
-
-- One-method transport contract.
-- Deterministic mock transport.
-- Request recording.
-- Transport error normalization.
-
-Status:
-
-- Appears implemented based on observed source/tests.
-- Not approved.
-
-## Proposed Milestone 5: Runtime Orchestration
-
-Observed evidence:
+Observed:
 
 - `HttpRuntime`
-- `ExecutionContext`
-- `compose_middleware`
-- Runtime tests.
+- effective request construction
+- base URL handling
+- default header merging
+- timeout resolution
+- middleware pipeline execution
+- transport delegation
+- return-type validation
 
-Acceptance criteria:
+### Middleware Policies
 
-- Runtime builds effective requests.
-- Runtime merges default settings.
-- Runtime delegates to middleware.
-- Runtime delegates execution to transport.
-- Runtime validates response type.
+Observed:
 
-Status:
+- generic auth/header middleware
+- retry middleware
+- rate-limit middleware
 
-- Appears implemented based on observed source/tests.
-- Not approved.
+Middleware behavior is policy behavior. It is not owned by the runtime
+orchestrator.
 
-## Proposed Milestone 6: Middleware Policies
+### Error Normalization
 
-Observed evidence:
+Observed:
 
-- Authentication middleware.
-- Bearer token middleware.
-- Basic auth middleware.
-- API key header middleware.
-- Custom header injection middleware.
-- Retry middleware.
-- Rate-limit middleware.
-- Auth and policy tests.
+- package-level error hierarchy
+- middleware failure normalization
+- transport failure normalization
+- invalid collaborator return-type handling
 
-Acceptance criteria:
+### Documentation Remediation
 
-- Middleware modifies execution through request copies.
-- Retry handles transport failures.
-- Rate limiting uses injectable sleep/clock behavior.
-- Invalid policy configuration fails fast.
+Current:
 
-Status:
+- skeleton-only documentation language has been removed
+- API boundary disposition has been documented
+- live HTTP transport absence has been documented as a non-goal
 
-- Appears implemented based on observed source/tests.
-- Not approved.
+## Non-Approved Capabilities
 
-## Proposed Milestone 7: Error Normalization
+No live HTTP transport milestone is approved or implemented.
 
-Observed evidence:
+The following remain outside current R002 scope unless separately approved:
 
-- `HttpRuntimeError`
-- `HttpConfigurationError`
-- `HttpTransportError`
-- `HttpTimeoutError`
-- `HttpResponseError`
-- `HttpMiddlewareError`
-- Error tests.
+- `requests` transport
+- `httpx` transport
+- `aiohttp` transport
+- urllib transport
+- response decoding helpers
+- exchange-specific signing
+- downstream domain integrations
 
-Acceptance criteria:
+## Remaining Governance Work
 
-- Unknown middleware failures are wrapped.
-- Unknown transport failures are wrapped.
-- Normalized HTTP errors propagate.
-- Invalid collaborator return values fail fast.
+Future work may include:
 
-Status:
+- read-only documentation verification
+- build/sdist/wheel validation proposal
+- governance reassessment
+- explicit API freeze review
+- release-readiness review
 
-- Appears implemented based on observed source/tests.
-- Not approved.
-
-## Proposed Milestone 8: Documentation and Release Recovery
-
-Observed evidence:
-
-- README, docs, and examples still contain skeleton or placeholder language.
-
-Acceptance criteria:
-
-- README reflects observed implementation.
-- API documentation reflects approved API.
-- Examples demonstrate approved usage.
-- Release notes and changelog align with approved scope.
-
-Status:
-
-- Incomplete.
-- Not approved.
-
-## Recovery Status
-
-Proposed milestones 1-7 appear implemented based on observed source/tests but
-are not approved.
-
-Proposed milestone 8 is incomplete because documentation and examples remain
-stale or placeholder-level.
-
-No milestone is approved or frozen by this file.
-
-No live transport milestone is approved by this file.
+None of those activities are started or approved by this file.

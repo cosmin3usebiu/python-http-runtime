@@ -2,88 +2,135 @@
 
 ## Status
 
-This is a recovered draft proposal based on observed implementation evidence.
-It does not approve or freeze R002.
+This document describes the observed R002 architecture for documentation
+alignment. It does not approve R002, freeze the architecture, freeze the API,
+assign Release Phase, validate builds, or declare release readiness.
 
-R002 approval/freeze state remains unverified. The API is not frozen. Release Phase is not assigned.
-
-This design is not yet approved.
+R002 remains unapproved, unfrozen, API not frozen, and not in Release Phase.
 
 ## Purpose
 
-Provide a transport-neutral HTTP execution runtime for API-driven Python
-applications. The runtime coordinates request execution through immutable
-request and response objects, runtime settings, middleware, and a transport
-contract.
+R002 provides a reusable, transport-neutral HTTP runtime for API-driven Python
+applications.
 
-## Scope
+It owns generic HTTP request execution orchestration. It does not own concrete
+network transports, exchange behavior, market-data models, persistence, or
+trading logic.
 
-R002 owns:
+## Core Architecture
 
-- HTTP request boundary object.
-- HTTP response boundary object.
-- Runtime settings.
-- Runtime orchestration.
-- Transport abstraction.
-- Middleware composition.
-- Generic authentication middleware.
-- Retry middleware.
-- Rate-limit middleware.
-- Mock transport testing support.
-- Repository-native HTTP exceptions.
+```text
+HttpRequest
+    |
+    v
+HttpRuntime
+    |
+    v
+ExecutionContext
+    |
+    v
+Middleware pipeline
+    |
+    v
+Transport
+    |
+    v
+HttpResponse
+```
 
-## Non-Goals
+The runtime coordinates the pipeline. Middleware owns policy behavior. Transport
+owns request execution. Boundary objects carry data.
 
-R002 does not own:
+## Layer Responsibilities
 
-- Exchange-specific signing.
-- Exchange adapters.
-- Market-data endpoints.
-- Dataset persistence.
-- Trading logic.
-- Strategy logic.
-- Real network transport implementations unless separately approved.
-- Response decoding helpers such as JSON/text convenience APIs.
-- Domain-specific HTTP semantics.
+### Request Layer
 
-## Architecture Boundaries
+`HttpRequest` is the immutable request boundary object. It normalizes structural
+request data such as method, target, headers, query parameters, body, and
+per-request timeout.
 
-Boundary models:
+### Response Layer
 
-- `request.py`
-- `response.py`
-- `settings.py`
+`HttpResponse` is the immutable response boundary object. It contains raw
+transport-neutral response data only. Decoding helpers are intentionally
+excluded.
 
-Execution layer:
+### Settings Layer
 
-- `runtime.py`
-- `middleware.py`
+`RuntimeSettings` stores immutable runtime defaults such as `base_url`, default
+headers, and default timeout.
 
-Transport layer:
+### Transport Layer
 
-- `transport.py`
-- `testing.py`
+`Transport` is the primary execution extension point. It exposes only
+`execute(request)`.
 
-Internal middleware/policy layer:
+R002 does not ship concrete live network transports.
 
-- `auth.py`
-- `policies.py`
+### Runtime Layer
 
-Error layer:
+`HttpRuntime` orchestrates request execution by applying settings, creating
+execution state, running middleware, invoking the transport, and returning the
+response.
 
-- `errors.py`
+The runtime must not contain policy algorithms, concrete transport behavior, or
+domain-specific logic.
 
-## Dependency Policy
+### Middleware Layer
 
-R002 has no runtime package dependencies.
+Middleware applies behavior between runtime orchestration and transport
+execution.
 
-R002 must remain independent of downstream repositories. Downstream exchange,
-market-data, dataset, or application requirements must not silently redefine
-R002 scope.
+The middleware extension contracts are public but explicitly non-frozen/deferred:
 
-## Public / Private Module Boundary
+- `ExecutionMiddleware`
+- `ExecutionContext`
+- `ExecutionHandler`
+- `AuthenticationMiddleware`
 
-The observed package-root public API is:
+`compose_middleware` is internal-only.
+
+### Authentication Layer
+
+R002 includes generic authentication/header-injection middleware:
+
+- `BearerTokenMiddleware`
+- `BasicAuthMiddleware`
+- `ApiKeyHeaderMiddleware`
+- `CustomHeaderInjectionMiddleware`
+
+These are documented public submodule API candidates. They do not implement
+exchange-specific signing.
+
+### Policy Layer
+
+R002 includes policy middleware:
+
+- `RetryMiddleware`
+- `RateLimitMiddleware`
+
+These policies execute as middleware. They are not built into the runtime
+orchestrator.
+
+### Testing Layer
+
+`MockTransport` provides deterministic in-memory transport behavior for tests
+and examples. It is a documented public testing submodule API candidate.
+
+`MockTransportOutcome` and `_bind_request_to_response` are internal-only.
+
+### Error Layer
+
+Repository-native errors normalize runtime, configuration, transport, timeout,
+response-policy, and middleware failure categories.
+
+`HttpResponseError` is present as a response-policy category, but current runtime
+behavior does not implement status-based response policy handling that raises
+it.
+
+## Public / Private Boundary
+
+Package-root public API:
 
 - `HttpRuntime`
 - `HttpRequest`
@@ -91,49 +138,44 @@ The observed package-root public API is:
 - `RuntimeSettings`
 - `Transport`
 
-Middleware, authentication, retry, rate limiting, mock transport, and errors
-are observed implementation modules and require explicit review before any
-public API freeze.
+Documented public submodule API candidates:
 
-## Transport-Neutral Runtime Model
+- error classes
+- concrete auth middleware
+- retry/rate-limit middleware
+- `MockTransport`
 
-`HttpRuntime` orchestrates execution. `Transport` owns request execution.
-Middleware owns behavior. Boundary objects carry data.
+Public but non-frozen/deferred support contracts:
 
-The runtime must not contain exchange-specific, market-data-specific, or
-application-specific logic.
+- `ExecutionMiddleware`
+- `ExecutionContext`
+- `ExecutionHandler`
+- `AuthenticationMiddleware`
 
-## Middleware / Auth / Policy Boundary
+Internal-only implementation details:
 
-Authentication, retry, and rate limiting are implemented as middleware/policy
-behavior, not as runtime responsibilities.
+- `compose_middleware`
+- `MockTransportOutcome`
+- `_bind_request_to_response`
+- private helper functions
 
-These components are internal unless explicitly approved as public API.
+## Non-Goals
 
-## Validation Expectations
+R002 does not own:
 
-Request, response, and settings objects should validate structural invariants at
-construction. Invalid boundary data should fail fast.
+- live `requests`, `httpx`, `aiohttp`, or urllib transports
+- exchange-specific signing
+- exchange adapters
+- market-data endpoints
+- dataset persistence
+- response decoding helpers
+- trading, strategy, portfolio, or order logic
+- security certification
+- production-readiness or publication-readiness claims
 
-## Error-Handling Expectations
+## Dependency Policy
 
-Repository-native HTTP errors should preserve original exception context when
-normalizing transport or middleware failures.
+R002 has no runtime package dependencies.
 
-## Known Incomplete Or Deferred Capabilities
-
-R002 does not currently ship a concrete live HTTP transport.
-
-Real network transport implementations are out of scope unless separately
-approved.
-
-Response decoding helpers are not observed and should remain out of scope
-unless separately approved.
-
-## Evidence Limitations
-
-This design is recovered from observed source, tests, metadata, and stale
-documentation. Source and tests are evidence of implementation, not approval.
-
-This document does not approve R002, freeze R002, freeze the API, assign Release
-Phase, approve milestones, or declare release readiness.
+Downstream repositories may depend on R002 public contracts, but downstream
+requirements must not silently redefine R002 scope.
